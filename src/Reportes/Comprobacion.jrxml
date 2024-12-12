@@ -1,0 +1,217 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="Comprobacion" pageWidth="895" pageHeight="842" columnWidth="855" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="7a896f6a-5b4f-481a-8101-a9c767db70a2">
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="MySQL"/>
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.unit." value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageHeight" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.pageWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.topMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.bottomMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.leftMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.rightMargin" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnWidth" value="pixel"/>
+	<property name="com.jaspersoft.studio.unit.columnSpacing" value="pixel"/>
+	<queryString>
+		<![CDATA[SELECT 
+    cm.cod_mayor AS codigo_mayor,
+    cm.nombre AS cuenta_mayor,
+    COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0) AS debe,
+    COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0) AS haber,
+    CASE 
+        WHEN COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0) - 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0) > 0 
+        THEN 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0) - 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0)
+        ELSE 0 
+    END AS saldodeudor,
+    CASE 
+        WHEN COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0) - 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0) > 0 
+        THEN 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0) - 
+             COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0)
+        ELSE 0 
+    END AS saldoacreedor
+FROM 
+    cuentas_mayor cm
+LEFT JOIN 
+    subcuentas s ON cm.cod_mayor = s.cod_mayor
+LEFT JOIN 
+    libro_diario ld ON s.cod_subcuenta = ld.cod_subcuenta
+GROUP BY 
+    cm.cod_mayor, cm.nombre
+HAVING 
+    (COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0) - 
+     COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0)) > 0
+    OR 
+    (COALESCE(SUM(CASE WHEN ld.transaccion = 'HABER' THEN ld.monto ELSE 0 END), 0) - 
+     COALESCE(SUM(CASE WHEN ld.transaccion = 'DEBE' THEN ld.monto ELSE 0 END), 0)) > 0
+ORDER BY 
+    cm.cod_mayor;]]>
+	</queryString>
+	<field name="codigo_mayor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="codigo_mayor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cuentas_mayor"/>
+	</field>
+	<field name="cuenta_mayor" class="java.lang.String">
+		<property name="com.jaspersoft.studio.field.label" value="cuenta_mayor"/>
+		<property name="com.jaspersoft.studio.field.tree.path" value="cuentas_mayor"/>
+	</field>
+	<field name="debe" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="debe"/>
+	</field>
+	<field name="haber" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="haber"/>
+	</field>
+	<field name="saldodeudor" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="saldodeudor"/>
+	</field>
+	<field name="saldoacreedor" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="saldoacreedor"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="480" height="60" uuid="cb5b5fb1-d267-47b9-accb-1f6e62395a5c"/>
+				<textElement>
+					<font fontName="SansSerif" size="29"/>
+				</textElement>
+				<text><![CDATA[BALANZA DE COMPROBACION]]></text>
+			</staticText>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="0" width="60" height="30" uuid="f3db930f-f58b-43c7-8aac-340a57b9da42">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="541658ac-b9cc-499d-b87f-320293c294a3"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[CODIGO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="120" y="0" width="60" height="30" uuid="91300567-0bdc-4556-bc29-29308ae775af">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fa0ae994-197e-4b44-8f3a-14aa21aa02d6"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[CUENTA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="280" y="0" width="50" height="30" uuid="3a337aea-75f4-4b62-a888-49d6c4da283c">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f86e33b6-48cb-49e1-88f1-b1815f2614af"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[DEBE]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="380" y="0" width="60" height="30" uuid="8349be92-6318-4afb-bf17-553c69a1dd9b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0a9054eb-b609-4a5e-b0b9-891bcaed0907"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[HABER]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="480" y="0" width="120" height="30" uuid="80e8645c-48af-4a12-bb4b-0cc3eef09143">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea49a06a-bc0c-4537-a4ec-aece298fb3d6"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[SALDO DEUDOR]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="680" y="0" width="135" height="30" uuid="42c889f6-adc3-4d24-b0c0-f29929c2ace9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1fa4eeeb-49af-44c0-9e1c-0e5b8bdb2e1c"/>
+				</reportElement>
+				<textElement>
+					<font fontName="SansSerif" size="14"/>
+				</textElement>
+				<text><![CDATA[SALDO ACREEDOR]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="45" splitType="Stretch">
+			<textField>
+				<reportElement x="0" y="0" width="100" height="30" uuid="e4a5b633-14c0-4a2d-ba92-23a3b00d5017">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="541658ac-b9cc-499d-b87f-320293c294a3"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{codigo_mayor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="110" y="0" width="100" height="30" uuid="ee24894f-da0f-42d1-b94b-4c45fddd3eec">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="fa0ae994-197e-4b44-8f3a-14aa21aa02d6"/>
+				</reportElement>
+				<textFieldExpression><![CDATA[$F{cuenta_mayor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="280" y="0" width="100" height="30" uuid="ca0f77e0-d142-41b2-a0cd-2baba99913d9">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="f86e33b6-48cb-49e1-88f1-b1815f2614af"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["$"+$F{debe}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="0" width="100" height="30" uuid="b2882331-7591-4aa9-b9b3-522bf330e60b">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="0a9054eb-b609-4a5e-b0b9-891bcaed0907"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["$"+$F{haber}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="480" y="0" width="100" height="30" uuid="d98f2b5d-c816-4260-ab2a-fa002e42af26">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="ea49a06a-bc0c-4537-a4ec-aece298fb3d6"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["$"+$F{saldodeudor}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="680" y="0" width="100" height="30" uuid="19ffbd0b-d0b5-4b54-b696-84e09e7dc821">
+					<property name="com.jaspersoft.studio.spreadsheet.connectionID" value="1fa4eeeb-49af-44c0-9e1c-0e5b8bdb2e1c"/>
+				</reportElement>
+				<textFieldExpression><![CDATA["$"+$F{saldoacreedor}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="230" y="0" width="100" height="30" uuid="3b80e6f5-d17f-41bf-8383-d23968a4b2bb"/>
+				<textFieldExpression><![CDATA[$V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField pattern="MMMMM dd, yyyy">
+				<reportElement x="0" y="0" width="100" height="30" uuid="c9cb4ea6-0617-4757-b03a-f8e138176b11"/>
+				<textFieldExpression><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="650" y="0" width="100" height="30" uuid="675f3eb9-d3cf-494a-9fe0-3e2e1d08f7dc"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA["Page " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="750" y="0" width="100" height="30" uuid="9c0e96d2-d37a-4b25-989e-55e906e0e093"/>
+				<textElement textAlignment="Left"/>
+				<textFieldExpression><![CDATA[" of " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

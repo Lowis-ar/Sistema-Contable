@@ -1,0 +1,444 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.11.0.final using JasperReports Library version 6.11.0-0c4056ccaa4d25a5a8c45672d2f764ea3498bebb  -->
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="EResultados" pageWidth="595" pageHeight="842" columnWidth="555" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="5d7de00a-3706-43c8-963a-1d51d509d728">
+	<property name="com.jaspersoft.studio.data.sql.tables" value=""/>
+	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="SIC"/>
+	<queryString language="SQL">
+		<![CDATA[
+
+
+SELECT
+    -- Ventas (Activo: crédito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '5101' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN -ld.monto ELSE ld.monto END END), 0) AS ventas,
+
+    -- Rebajas sobre ventas (Pasivo: débito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4104' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN ld.monto ELSE -ld.monto END END), 0) AS rebajas_ventas,
+
+    -- Devoluciones sobre ventas (Pasivo: débito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4103' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN ld.monto ELSE -ld.monto END END), 0) AS devoluciones_ventas,
+
+    -- Compras (Activo: débito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4101' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN ld.monto ELSE -ld.monto END END), 0) AS compras,
+
+    -- Gastos sobre compras (Activo: débito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4102' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN ld.monto ELSE -ld.monto END END), 0) AS gastos_compras,
+
+    -- Rebajas sobre compras (Pasivo: crédito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '5103' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN -ld.monto ELSE ld.monto END END), 0) AS rebajas_compras,
+
+    -- Devoluciones sobre compras (Pasivo: crédito)
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '5102' THEN 
+        CASE WHEN ld.transaccion = 'Debe' THEN -ld.monto ELSE ld.monto END END), 0) AS devoluciones_compras,
+
+    -- Inventario inicial (Activo: débito), considerando todo el periodo del año
+    COALESCE(SUM(CASE WHEN ld.cod_subcuenta = '110601' AND ld.fecha BETWEEN '2024-01-01' AND '2024-12-31' THEN ld.monto END), 0) AS inventario_inicial,
+
+   -- Gastos de venta
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4301' THEN 
+                        CASE 
+                            WHEN ld.transaccion = 'Debe' THEN ld.monto 
+                            ELSE -ld.monto 
+                        END 
+                    END), 0) AS gastos_ventas,
+										  -- Gastos de financieros
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4303' THEN 
+                        CASE 
+                            WHEN ld.transaccion = 'Debe' THEN ld.monto 
+                            ELSE -ld.monto 
+                        END 
+                    END), 0) AS gastos_financieros,
+										 -- ingresos  financieros
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '5201' THEN 
+                        CASE 
+                            WHEN ld.transaccion = 'Haber' THEN ld.monto 
+                            ELSE -ld.monto 
+                        END 
+                    END), 0) AS ingresos_financieros,
+
+    -- Gastos de administración
+    COALESCE(SUM(CASE WHEN cm.cod_mayor = '4302' THEN 
+                        CASE 
+                            WHEN ld.transaccion = 'Debe' THEN ld.monto 
+                            ELSE -ld.monto 
+                        END 
+                    END), 0) AS gastos_administrativos
+FROM libro_diario ld
+LEFT JOIN subcuentas sc ON ld.cod_subcuenta = sc.cod_subcuenta
+LEFT JOIN cuentas_mayor cm ON sc.cod_mayor = cm.cod_mayor
+LEFT JOIN cuentas_principales cp ON cm.cod_principal = cp.cod_principal
+LEFT JOIN catalogo c ON cp.cod_catalogo = c.cod_catalogo
+]]>
+	</queryString>
+	<field name="ventas" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ventas"/>
+	</field>
+	<field name="rebajas_ventas" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="rebajas_ventas"/>
+	</field>
+	<field name="devoluciones_ventas" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="devoluciones_ventas"/>
+	</field>
+	<field name="compras" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="compras"/>
+	</field>
+	<field name="gastos_compras" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="gastos_compras"/>
+	</field>
+	<field name="rebajas_compras" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="rebajas_compras"/>
+	</field>
+	<field name="devoluciones_compras" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="devoluciones_compras"/>
+	</field>
+	<field name="inventario_inicial" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="inventario_inicial"/>
+	</field>
+	<field name="gastos_ventas" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="gastos_ventas"/>
+	</field>
+	<field name="gastos_financieros" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="gastos_financieros"/>
+	</field>
+	<field name="ingresos_financieros" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="ingresos_financieros"/>
+	</field>
+	<field name="gastos_administrativos" class="java.math.BigDecimal">
+		<property name="com.jaspersoft.studio.field.label" value="gastos_administrativos"/>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="48" splitType="Stretch">
+			<staticText>
+				<reportElement x="110" y="9" width="310" height="30" uuid="46523671-16b5-46d2-b80d-3cf9c4cef73b"/>
+				<textElement>
+					<font size="22"/>
+				</textElement>
+				<text><![CDATA[ESTADO DE RESULTADOS]]></text>
+			</staticText>
+		</band>
+	</title>
+	<detail>
+		<band height="728" splitType="Stretch">
+			<staticText>
+				<reportElement x="0" y="10" width="100" height="30" uuid="b00c2b74-3c95-4d1e-98ed-e489d2a9409a"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[ventas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="40" width="280" height="30" uuid="559ca2f9-586c-452c-97a5-dc71a374d8d3"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[rebajas y devoluciones sobre ventas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="70" width="100" height="30" uuid="fc83d75f-d9e6-4e40-914f-ae44f8a08639"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[ventas netas]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="10" width="100" height="30" uuid="fcb581e5-83b6-4c10-8230-e6f276566260"/>
+				<textFieldExpression><![CDATA[$F{ventas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="40" width="100" height="30" uuid="d951e60d-8b73-44e0-917f-03d8aaabfa50"/>
+				<textFieldExpression><![CDATA[$F{rebajas_ventas}.doubleValue() + $F{devoluciones_ventas}.doubleValue()]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="70" width="100" height="30" uuid="43d0459f-66dd-4856-85e9-8e3378a79fc5"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="110" width="100" height="30" uuid="dff260af-2491-455b-9f73-f047b579f94a"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[compras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="140" width="280" height="30" uuid="028b1cb6-3256-4443-9c1f-70d8b5223746"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[gastos sobre compras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="170" width="180" height="30" uuid="5d12ea3f-65ee-4069-b60c-cb7225a2a5f9"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[compras totales]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="110" width="100" height="30" uuid="251513a7-1683-4035-a802-7bac3fcf396b"/>
+				<textFieldExpression><![CDATA[$F{compras}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="140" width="100" height="30" uuid="53828dc3-28ea-4d94-bb53-4850df5ae108"/>
+				<textFieldExpression><![CDATA[$F{gastos_compras}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="170" width="100" height="30" uuid="bb934d73-25cc-4e81-999c-ac0da5d44172"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{compras}.doubleValue() + $F{gastos_compras}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="210" width="280" height="30" uuid="7ee5f852-a7de-411d-ada3-74607c4865c2"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[rebajas y devoluciones sobre compras]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="240" width="180" height="30" uuid="5ffb8673-d854-4e10-bcb5-d2794da0a073"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[compras netas]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="210" width="100" height="30" uuid="fa3e6900-8d23-4c1b-99d4-52b81e4d5a18"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="320" width="100" height="30" uuid="d72f642a-e9a8-493f-bf60-027bd1b13539"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue())) + $F{inventario_inicial}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="280" width="180" height="30" uuid="3ec40c95-9cf9-4f34-803f-a10ad297e98a"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[inventario inicial]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="350" width="100" height="30" uuid="3add84bf-44d1-4f43-849a-635d3b03c31f"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 200000.0)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="320" width="200" height="30" uuid="ad1cb97e-1d97-46f6-8cb9-710e9791acd7"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[mercaderia para la venta]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="240" width="100" height="30" uuid="e87bd035-bb97-4c82-b70e-7eb75522b306"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue())))]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="350" width="180" height="30" uuid="49dece71-39f3-4683-9104-f775cacc9d1e"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[inventario final]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="280" width="100" height="30" uuid="0e6a56ed-fc03-49ff-8269-07dc425e73e1"/>
+				<textFieldExpression><![CDATA[$F{inventario_inicial}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="380" width="180" height="30" uuid="945ad15b-2621-46f4-87e4-c48c99654d90"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[costo de venta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="410" width="180" height="30" uuid="894cc0bf-f910-4cc1-8e43-138b15a075dd"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[utilidad bruta]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="380" width="100" height="30" uuid="44f4209f-1d4b-4abe-8315-0947c60ed926"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue())) + $F{inventario_inicial}.doubleValue() - 200000)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="410" width="100" height="30" uuid="213244bd-9e69-417f-a355-c11d9cf8d0a2"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    ( $F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+    ( (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+    ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+    $F{inventario_inicial}.doubleValue() - 200000))
+)]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="450" width="180" height="30" uuid="05f1cdee-287b-433d-9724-1a23a92b7e49"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[gastos de operacion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="480" width="180" height="30" uuid="afe363ab-b755-4de0-abcc-879b9dc24412"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[gastos de ventas]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="510" width="180" height="30" uuid="7fe5e5d0-732a-47c1-91d4-29b9b51e232f"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[gastos de administracion]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="485" width="100" height="30" uuid="2e98d8d0-f352-4e5f-abed-ee26723fe294"/>
+				<textFieldExpression><![CDATA[$F{gastos_ventas}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="510" width="100" height="30" uuid="bd885786-0d3c-4a80-acfe-adcf260d94a3"/>
+				<textFieldExpression><![CDATA[$F{gastos_administrativos}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="450" width="100" height="30" uuid="17e053d2-5296-4b4f-a3ed-7f228ef6772c"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", $F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="0" y="550" width="180" height="30" uuid="3e98d5bf-d6d1-4be9-bce4-94372da26622"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[utilidad de operacion]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="590" width="180" height="30" uuid="35b5fc90-e678-48b8-9fc5-a314522e1a0a"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[reserva legal]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="620" width="280" height="30" uuid="b4a6abc4-b8e7-440f-bef5-8c89e43ecf58"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[utilidad antes de impuestos]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="650" width="180" height="30" uuid="2e73216b-5641-4877-b574-7c4c4c5d3bb8"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[impuesto sobre la renta]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="690" width="180" height="30" uuid="1e411a1a-19c5-4e02-a955-454c3c1f18fd"/>
+				<textElement>
+					<font size="16"/>
+				</textElement>
+				<text><![CDATA[utilidad del ejercicio]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="380" y="540" width="100" height="30" uuid="66f47adc-f05c-4cc8-bf52-cda5270467a5"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    ( $F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+    ( (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+    ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+    $F{inventario_inicial}.doubleValue() - 200000))- ($F{gastos_financieros}.doubleValue()+$F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue())+$F{ingresos_financieros}.doubleValue())]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="580" width="100" height="30" uuid="53479bd4-750e-4bc8-9804-7df3e74f585b"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    ((($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+    (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+    ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+    $F{inventario_inicial}.doubleValue() - 200000) - 
+    ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue()))) * 0.07)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="620" width="100" height="30" uuid="000aaddd-4e96-4aad-b86f-1e384a5b488f"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    (
+        ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+        (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+        ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+        $F{inventario_inicial}.doubleValue() - 200000) - 
+        ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+    ) - 
+    (
+        (
+            ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+            (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+            ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+            $F{inventario_inicial}.doubleValue() - 200000) - 
+            ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+        ) * 0.07
+    )
+)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="650" width="100" height="30" uuid="796157bf-08f3-4220-baab-3dd5f5ce5a46"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    ((
+        ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+        (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+        ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+        $F{inventario_inicial}.doubleValue() - 200000) - 
+        ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+    ) - 
+    (
+        (
+            ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+            (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+            ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+            $F{inventario_inicial}.doubleValue() - 200000) - 
+            ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+        ) * 0.07
+    ))*0.25
+)]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="380" y="690" width="100" height="30" uuid="73789562-62d0-46eb-83f1-5dfa653dac56"/>
+				<textFieldExpression><![CDATA[String.format("%.2f", 
+    (
+        ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+        (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+        ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+        $F{inventario_inicial}.doubleValue() - 200000) - 
+        ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+    ) - 
+    (
+        (
+            ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+            (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+            ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+            $F{inventario_inicial}.doubleValue() - 200000) - 
+            ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+        ) * 0.07
+    )
+-( ((
+        ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+        (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+        ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+        $F{inventario_inicial}.doubleValue() - 200000) - 
+        ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+    ) - 
+    (
+        (
+            ($F{ventas}.doubleValue() - $F{rebajas_ventas}.doubleValue() - $F{devoluciones_ventas}.doubleValue()) - 
+            (($F{compras}.doubleValue() + $F{gastos_compras}.doubleValue()) - 
+            ($F{rebajas_compras}.doubleValue() + $F{devoluciones_compras}.doubleValue()) + 
+            $F{inventario_inicial}.doubleValue() - 200000) - 
+            ($F{gastos_ventas}.doubleValue() + $F{gastos_administrativos}.doubleValue()+$F{ingresos_financieros}.doubleValue())
+        ) * 0.07
+    ))*0.25)
+)]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+</jasperReport>
