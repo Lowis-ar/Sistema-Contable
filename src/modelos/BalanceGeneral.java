@@ -1,62 +1,42 @@
 package modelos;
 
-/**
- *
- * @author Luis
- */
 public class BalanceGeneral {
 
     private String codigo;
-    private String tipo;
     private String cuenta;
-    private String Monto;
+    private String monto; // usas Strings en el DAO; aquí mantenemos ese tipo
 
     public BalanceGeneral() {
     }
 
-    public BalanceGeneral(String codigo, String tipo, String cuenta, String Monto) {
+    public BalanceGeneral(String codigo, String cuenta, String monto) {
         this.codigo = codigo;
-        this.tipo = tipo;
         this.cuenta = cuenta;
-        this.Monto = Monto;
-    }
-
-    public BalanceGeneral(String tipo, String cuenta, String Monto) {
-        this.tipo = tipo;
-        this.cuenta = cuenta;
-        this.Monto = Monto;
+        this.monto = monto;
     }
 
     public String getCodigo() {
         return codigo;
     }
 
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
-    }
-
-    public String getTipo() {
-        return tipo;
-    }
-
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
+    public void setCodigo(String Codigo) {
+        this.codigo = Codigo;
     }
 
     public String getCuenta() {
         return cuenta;
     }
 
-    public void setCuenta(String cuenta) {
-        this.cuenta = cuenta;
+    public void setCuenta(String Cuenta) {
+        this.cuenta = Cuenta;
     }
 
     public String getMonto() {
-        return Monto;
+        return monto;
     }
 
     public void setMonto(String Monto) {
-        this.Monto = Monto;
+        this.monto = Monto;
     }
 
 }
